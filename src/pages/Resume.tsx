@@ -15,115 +15,12 @@ import { WorkRow } from "@/components/ui/primitives/WorkRow";
 import { Chip } from "@/components/ui/primitives/Chip";
 import { Tag } from "@/components/ui/primitives/Tag";
 import { Button } from "@/components/ui/primitives/Button";
-import { personalInfo, experiences, education } from "@/data/portfolioData";
+import { personalInfo, experiences, education, skillCategories, resumeProjects, resumeCertifications } from "@/data/portfolioData";
 
-const skills = {
-  Frontend: [
-    "React",
-    "Vue.js",
-    "TypeScript",
-    "JavaScript",
-    "HTML/CSS",
-    "Tailwind CSS",
-    "Next.js",
-  ],
-  Backend: [
-    "Node.js",
-    "Express.js",
-    "Python",
-    "REST APIs",
-    "GraphQL",
-    "Microservices",
-  ],
-  Database: ["PostgreSQL", "MongoDB", "Redis", "Prisma", "MySQL"],
-  "DevOps & Tools": ["Docker", "AWS", "CI/CD", "Git", "Linux", "Nginx"],
-  Testing: [
-    "Jest",
-    "Cypress",
-    "Testing Library",
-    "Unit Testing",
-    "E2E Testing",
-  ],
-};
-
-const projects = [
-  {
-    name: "Code Rev",
-    description:
-      "An online platform where developers can share, review, and discover code snippets. Includes real-time commenting and user authentication.",
-    technologies: [
-      "React",
-      "Node.js",
-      "MongoDB",
-      "Express.js",
-      "Vercel",
-      "Cloudinary",
-    ],
-    impact: "500+ users sharing and reviewing code with real-time updates",
-  },
-  {
-    name: "AI Image Generation Platform",
-    description:
-      "A web application where users can generate AI-powered images and browse curated categories, with admin upload and management features.",
-    technologies: [
-      "Next.js",
-      "Node.js",
-      "Cloudinary",
-      "React Query",
-      "Express.js",
-    ],
-    impact:
-      "Serves hundreds of AI-generated images daily with organized category structure",
-  },
-  {
-    name: "YouTune",
-    description:
-      "A non-stop YouTube playlist player app for Android, allowing users to queue videos and play them continuously without interruption.",
-    technologies: [
-      "Kotlin",
-      "Jetpack Compose",
-      "YouTube API",
-      "Android Studio",
-    ],
-    impact:
-      "Improved user experience for continuous video playback on mobile",
-  },
-  {
-    name: "Habit Tracker App",
-    description:
-      "A simple Android app to track daily habits, view history, and measure progress over time. Built with Jetpack Compose and Kotlin.",
-    technologies: ["Kotlin", "Jetpack Compose", "Android Studio"],
-    impact: "Helps users track and improve daily habits efficiently",
-  },
-  {
-    name: "DevLink – Developer Profile Directory",
-    description:
-      "A web app to create and browse developer profiles. Built to strengthen understanding of Next.js and full-stack development.",
-    technologies: ["Next.js", "React", "Node.js", "MongoDB", "Vercel"],
-    impact: "Simplifies networking by centralizing developer profiles",
-  },
-];
-
-const certifications = [
-  {
-    name: "AWS Certified Developer Associate",
-    issuer: "Amazon Web Services",
-    date: "2023",
-    credentialId: "AWS-CDA-2023-001",
-  },
-  {
-    name: "Google Cloud Professional Developer",
-    issuer: "Google Cloud",
-    date: "2022",
-    credentialId: "GCP-PD-2022-001",
-  },
-  {
-    name: "Meta Frontend Developer Certificate",
-    issuer: "Meta",
-    date: "2021",
-    credentialId: "META-FE-2021-001",
-  },
-];
+// Derive a flat {category -> skillNames[]} map from the centralised skillCategories
+const skills = Object.fromEntries(
+  skillCategories.map((cat) => [cat.name, cat.skills.map((s) => s.name)]),
+);
 
 const Resume = () => {
   return (
@@ -293,7 +190,7 @@ const Resume = () => {
         <div className="mt-12">
           <SectionHeader index="04" title="Notable Projects" />
           <div className="mt-2">
-            {projects.map((project, index) => (
+            {resumeProjects.map((project, index) => (
               <WorkRow
                 key={project.name}
                 index={String(index + 1).padStart(2, "0")}
@@ -309,7 +206,7 @@ const Resume = () => {
         <div className="mt-12">
           <SectionHeader index="05" title="Certifications" />
           <div className="mt-6 space-y-5">
-            {certifications.map((cert) => (
+            {resumeCertifications.map((cert) => (
               <div
                 key={cert.name}
                 className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center"

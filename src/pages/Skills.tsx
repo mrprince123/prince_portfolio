@@ -36,6 +36,7 @@ import { StatStrip } from "@/components/ui/primitives/StatStrip";
 import { Skeleton } from "@/components/ui/primitives/Skeleton";
 import { Reveal } from "@/components/ui/primitives/Reveal";
 import { Chip } from "@/components/ui/primitives/Chip";
+import { skillCategories, learningTech } from "@/data/portfolioData";
 
 // Explicit icon map — only the icons referenced in the skills data are imported
 // so the route chunk doesn't bundle the entire lucide set.
@@ -66,80 +67,14 @@ const normalize = (categories: RawCategory[] | undefined) =>
     skills: (c.skills ?? c.skillsList ?? []).map((s) => ({ name: s.name, icon: s.icon ?? "" })),
   }));
 
-const fallback: RawCategory[] = [
-  {
-    _id: "1",
-    name: "Frontend Development",
-    description: "Modern client-side technologies for building interactive user interfaces.",
-    skillsList: [
-      { name: "React", icon: "Atom" },
-      { name: "TypeScript", icon: "FileCode" },
-      { name: "Next.js", icon: "Zap" },
-      { name: "Tailwind CSS", icon: "Palette" },
-      { name: "Vue.js", icon: "Component" },
-      { name: "HTML/CSS", icon: "Layout" },
-      { name: "JavaScript", icon: "Code" },
-      { name: "Sass", icon: "Paintbrush" },
-    ],
-  },
-  {
-    _id: "2",
-    name: "Backend Development",
-    description: "Server-side technologies and APIs for robust application architecture.",
-    skillsList: [
-      { name: "Node.js", icon: "Server" },
-      { name: "Express.js", icon: "Layers" },
-      { name: "Python", icon: "Code2" },
-      { name: "REST APIs", icon: "Globe" },
-      { name: "GraphQL", icon: "Network" },
-      { name: "WebSockets", icon: "Wifi" },
-      { name: "Microservices", icon: "Boxes" },
-    ],
-  },
-  {
-    _id: "3",
-    name: "Database Technologies",
-    description: "Data storage, management, and optimization solutions.",
-    skillsList: [
-      { name: "PostgreSQL", icon: "Database" },
-      { name: "MongoDB", icon: "Leaf" },
-      { name: "Redis", icon: "Zap" },
-      { name: "Prisma", icon: "Triangle" },
-      { name: "MySQL", icon: "Cylinder" },
-      { name: "SQLite", icon: "HardDrive" },
-    ],
-  },
-  {
-    _id: "4",
-    name: "DevOps & Cloud",
-    description: "Infrastructure, deployment, and cloud platform expertise.",
-    skillsList: [
-      { name: "Docker", icon: "Container" },
-      { name: "AWS", icon: "Cloud" },
-      { name: "Vercel", icon: "Triangle" },
-      { name: "GitHub Actions", icon: "GitBranch" },
-      { name: "Nginx", icon: "Server" },
-      { name: "Kubernetes", icon: "Boxes" },
-      { name: "CI/CD", icon: "GitCommit" },
-    ],
-  },
-  {
-    _id: "5",
-    name: "Tools & Development",
-    description: "Development tools, testing frameworks, and productivity software.",
-    skillsList: [
-      { name: "Git", icon: "GitBranch" },
-      { name: "VS Code", icon: "Code2" },
-      { name: "Figma", icon: "Figma" },
-      { name: "Jest", icon: "TestTube" },
-      { name: "Webpack", icon: "Package" },
-      { name: "ESLint", icon: "CheckCircle" },
-      { name: "Postman", icon: "Send" },
-    ],
-  },
-];
+// Adapt portfolioData.skillCategories to the shape RawCategory expects
+const fallback: RawCategory[] = skillCategories.map((cat, i) => ({
+  _id: String(i + 1),
+  name: cat.name,
+  description: cat.description,
+  skills: cat.skills.map((s) => ({ name: s.name, icon: s.icon })),
+}));
 
-const learningTech = ["AI/ML", "Web3", "Rust", "Go", "Kubernetes", "Microservices", "GraphQL", "Blockchain"];
 
 const Skills = () => {
   const { data, isLoading } = useResource<RawCategory[]>(

@@ -176,8 +176,8 @@ const Articles = () => {
         </div>
 
         {isLoading ? (
-          <div className="mt-16">
-            <Skeleton variant="card" count={4} />
+          <div className="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <Skeleton variant="card" count={6} />
           </div>
         ) : (
           <>
@@ -194,6 +194,7 @@ const Articles = () => {
                       description={article.description}
                       tags={article.tags ?? []}
                       href={article.articleLink}
+                      image={article.coverImage}
                     />
                   ))}
                 </div>
@@ -214,6 +215,7 @@ const Articles = () => {
                         description={article.description}
                         tags={article.tags ?? []}
                         href={article.articleLink}
+                        image={article.coverImage}
                       />
                     ))}
                   </div>

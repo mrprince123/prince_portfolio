@@ -8,7 +8,7 @@ import portrait from "@/assets/princesahni2.jpg";
 
 const AboutSection = () => (
   <section id="about-section" className="container mx-auto px-6 py-20">
-    <SectionHeader index="06" title="About" />
+    <SectionHeader index="03" title="About" />
 
     <div className="mt-8 grid gap-10 md:grid-cols-[1fr_320px] md:gap-16">
       <Reveal>

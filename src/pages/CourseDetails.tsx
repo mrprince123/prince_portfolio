@@ -216,6 +216,17 @@ const CourseDetails = () => {
             </Button>
           </div>
 
+          {/* Course Banner */}
+          {course.coverImage && (
+            <div className="mb-8 overflow-hidden rounded-xl border border-border">
+              <img
+                src={course.coverImage}
+                alt={course.title}
+                className="h-64 w-full object-cover md:h-80"
+              />
+            </div>
+          )}
+
           {/* Course header */}
           <div className="mb-8">
             <div className="flex flex-wrap items-center gap-2">

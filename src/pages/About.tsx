@@ -19,7 +19,7 @@ import introVideo from "@/assets/princesahni.mp4";
 
 const facts = [
   { icon: MapPin, label: "Based in", value: personalInfo.location },
-  { icon: Briefcase, label: "Currently", value: "Associate Developer · Webkul" },
+  { icon: Briefcase, label: "Currently", value: "Software Engineer" },
   { icon: Sparkles, label: "Focus", value: "Full-Stack · Cloud" },
 ];
 

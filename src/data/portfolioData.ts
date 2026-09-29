@@ -22,7 +22,7 @@ export const personalInfo = {
   instagram: "https://www.instagram.com/_mrprince123_/",
   medium: "https://medium.com/@mrprince123",
   twitter: "https://twitter.com/MrPrince185",
-  resumeUrl: "https://drive.google.com/file/d/1PhoLHI29R9_bo1wT9h42XBmftDb6wT1Y/view?usp=drive_link",
+  resumeUrl: "https://drive.google.com/file/d/1I3w6h7iIQWFWrbZRqQOcITruMHb52R5i/view?usp=sharing",
   resumePreviewUrl: "https://drive.google.com/file/d/1PhoLHI29R9_bo1wT9h42XBmftDb6wT1Y/preview",
   bio: `Hi! I'm Prince Kumar Sahni, a passionate Software Engineer who loves building impactful digital products. Over the past few years, I've worked on everything from Android apps to full-stack web platforms, always focusing on performance, scalability, and user experience.`,
   bioExtended: `I take pride in approaching every project with a problem-solving mindset. Whether it's optimizing performance, designing scalable architectures, or debugging complex issues, I enjoy breaking down challenges into clear, actionable steps. My focus is always on writing clean, efficient, and maintainable code that drives real results.`,
@@ -122,7 +122,9 @@ export const skillCategories = [
     skills: [
       { name: "Node.js", icon: "Server", color: "#339933" },
       { name: "Express.js", icon: "Layers", color: "#ffffff" },
-      { name: "Python", icon: "Snake", color: "#3776AB" },
+      { name: "Python", icon: "Code2", color: "#3776AB" },
+      { name: "Django", icon: "Shield", color: "#092E20" },
+      { name: "FastAPI", icon: "Zap", color: "#009688" },
       { name: "REST APIs", icon: "Globe", color: "#00f0ff" },
       { name: "GraphQL", icon: "Network", color: "#E10098" },
       { name: "Microservices", icon: "Boxes", color: "#8b5cf6" },
@@ -319,4 +321,63 @@ export const codeSnippets = [
   `SELECT * FROM skills\nWHERE level = 'expert'\nORDER BY experience DESC;`,
   `docker build -t portfolio .\ndocker push registry/app`,
   `git commit -m "feat: ✨"\ngit push origin main`,
+];
+
+export const resumeProjects = [
+  {
+    name: "Code Rev",
+    description:
+      "An online platform where developers can share, review, and discover code snippets. Includes real-time commenting and user authentication.",
+    technologies: ["React", "Node.js", "MongoDB", "Express.js", "Vercel", "Cloudinary"],
+    impact: "500+ users sharing and reviewing code with real-time updates",
+  },
+  {
+    name: "AI Image Generation Platform",
+    description:
+      "A web application where users can generate AI-powered images and browse curated categories, with admin upload and management features.",
+    technologies: ["Next.js", "Node.js", "Cloudinary", "React Query", "Express.js"],
+    impact: "Serves hundreds of AI-generated images daily with organized category structure",
+  },
+  {
+    name: "YouTune",
+    description:
+      "A non-stop YouTube playlist player app for Android, allowing users to queue videos and play them continuously without interruption.",
+    technologies: ["Kotlin", "Jetpack Compose", "YouTube API", "Android Studio"],
+    impact: "Improved user experience for continuous video playback on mobile",
+  },
+  {
+    name: "Habit Tracker App",
+    description:
+      "A simple Android app to track daily habits, view history, and measure progress over time. Built with Jetpack Compose and Kotlin.",
+    technologies: ["Kotlin", "Jetpack Compose", "Android Studio"],
+    impact: "Helps users track and improve daily habits efficiently",
+  },
+  {
+    name: "DevLink – Developer Profile Directory",
+    description:
+      "A web app to create and browse developer profiles. Built to strengthen understanding of Next.js and full-stack development.",
+    technologies: ["Next.js", "React", "Node.js", "MongoDB", "Vercel"],
+    impact: "Simplifies networking by centralizing developer profiles",
+  },
+];
+
+export const resumeCertifications = [
+  {
+    name: "AWS Certified Developer Associate",
+    issuer: "Amazon Web Services",
+    date: "2023",
+    credentialId: "AWS-CDA-2023-001",
+  },
+  {
+    name: "Google Cloud Professional Developer",
+    issuer: "Google Cloud",
+    date: "2022",
+    credentialId: "GCP-PD-2022-001",
+  },
+  {
+    name: "Meta Frontend Developer Certificate",
+    issuer: "Meta",
+    date: "2021",
+    credentialId: "META-FE-2021-001",
+  },
 ];

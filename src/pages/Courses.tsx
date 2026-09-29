@@ -209,8 +209,8 @@ const Courses = () => {
         </div>
 
         {isLoading ? (
-          <div className="mt-16">
-            <Skeleton variant="card" count={4} />
+          <div className="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <Skeleton variant="card" count={6} />
           </div>
         ) : (
           <>
@@ -227,6 +227,7 @@ const Courses = () => {
                       description={course.description}
                       tags={course.tags ?? []}
                       href={`/courses/${course.slug}`}
+                      image={course.coverImage}
                     />
                   ))}
                 </div>
@@ -245,6 +246,7 @@ const Courses = () => {
                     description={course.description}
                     tags={course.tags ?? []}
                     href={`/courses/${course.slug}`}
+                    image={course.coverImage}
                   />
                 ))}
               </div>
