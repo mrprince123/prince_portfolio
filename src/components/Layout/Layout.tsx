@@ -14,6 +14,11 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isAdmin = location.pathname.startsWith("/admin");
+
+  if (isAdmin) {
+    return <div className="min-h-screen bg-background text-foreground">{children}</div>;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
