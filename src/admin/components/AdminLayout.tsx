@@ -24,6 +24,11 @@ import {
   Sun,
   Moon,
   MoreHorizontal,
+  Sparkles,
+  Lightbulb,
+  Calendar,
+  Share2,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +56,14 @@ interface NavItem {
   badgeKey?: "contacts";
 }
 
+const publishingNavItems: NavItem[] = [
+  { label: "AI Studio", href: "/admin/publishing/studio", icon: Sparkles },
+  { label: "Ideas Vault", href: "/admin/publishing/ideas", icon: Lightbulb },
+  { label: "Publish Queue", href: "/admin/publishing/calendar", icon: Calendar },
+  { label: "Platforms", href: "/admin/publishing/platforms", icon: Share2 },
+  { label: "Audit Logs", href: "/admin/publishing/logs", icon: Clock },
+];
+
 const navItems: NavItem[] = [
   { label: "Overview", href: "/admin/overview", icon: LayoutDashboard },
   { label: "Inquiries", href: "/admin/contacts", icon: Mail, badgeKey: "contacts" },
@@ -72,6 +85,11 @@ const mobilePrimaryTabs = [
 ];
 
 const mobileSecondaryItems = [
+  { label: "AI Studio", href: "/admin/publishing/studio", icon: Sparkles, desc: "Multi-Platform AI Drafts" },
+  { label: "Ideas Vault", href: "/admin/publishing/ideas", icon: Lightbulb, desc: "Brainstorming Bank" },
+  { label: "Publish Queue", href: "/admin/publishing/calendar", icon: Calendar, desc: "Scheduled Posts" },
+  { label: "Platforms", href: "/admin/publishing/platforms", icon: Share2, desc: "LinkedIn, Medium, Bot" },
+  { label: "Audit Logs", href: "/admin/publishing/logs", icon: Clock, desc: "Execution Telemetry" },
   { label: "Courses", href: "/admin/courses", icon: GraduationCap, desc: "Curricula & Modules" },
   { label: "Skills", href: "/admin/skills", icon: Cpu, desc: "Tech Stack & Domains" },
   { label: "Articles", href: "/admin/articles", icon: BookOpen, desc: "Medium Publications" },
@@ -97,7 +115,9 @@ export const AdminLayout: React.FC = () => {
 
   const pendingContacts = stats?.counts?.contacts?.pending ?? 0;
 
-  const currentRouteItem = navItems.find((item) =>
+  const allNavItems = [...publishingNavItems, ...navItems];
+
+  const currentRouteItem = allNavItems.find((item) =>
     location.pathname.startsWith(item.href)
   );
 
@@ -130,48 +150,88 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex-1 overflow-y-auto px-3 py-4">
-          <div className="px-3 pb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
-            Navigation
-          </div>
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname.startsWith(item.href);
-              const badgeCount = item.badgeKey === "contacts" ? pendingContacts : 0;
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+          {/* AI Publishing Section */}
+          <div>
+            <div className="px-3 pb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70 flex items-center justify-between">
+              <span>AI Publishing</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-sans font-medium">Free Tier</span>
+            </div>
+            <nav className="space-y-1">
+              {publishingNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname.startsWith(item.href);
 
-              return (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  className={`group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-all ${
-                    isActive
-                      ? "bg-secondary text-foreground font-semibold shadow-xs"
-                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon
-                      className={`h-4 w-4 transition-colors ${
-                        isActive
-                          ? "text-primary"
-                          : "text-muted-foreground group-hover:text-foreground"
-                      }`}
-                    />
-                    <span>{item.label}</span>
-                  </div>
-                  {badgeCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-auto h-5 px-1.5 text-[10px] font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                    >
-                      {badgeCount}
-                    </Badge>
-                  )}
-                </NavLink>
-              );
-            })}
-          </nav>
+                return (
+                  <NavLink
+                    key={item.href}
+                    to={item.href}
+                    className={`group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-all ${
+                      isActive
+                        ? "bg-secondary text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon
+                        className={`h-4 w-4 transition-colors ${
+                          isActive
+                            ? "text-primary"
+                            : "text-muted-foreground group-hover:text-foreground"
+                        }`}
+                      />
+                      <span>{item.label}</span>
+                    </div>
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Portfolio CMS Section */}
+          <div>
+            <div className="px-3 pb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
+              Content & Site
+            </div>
+            <nav className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname.startsWith(item.href);
+                const badgeCount = item.badgeKey === "contacts" ? pendingContacts : 0;
+
+                return (
+                  <NavLink
+                    key={item.href}
+                    to={item.href}
+                    className={`group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-all ${
+                      isActive
+                        ? "bg-secondary text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon
+                        className={`h-4 w-4 transition-colors ${
+                          isActive
+                            ? "text-primary"
+                            : "text-muted-foreground group-hover:text-foreground"
+                        }`}
+                      />
+                      <span>{item.label}</span>
+                    </div>
+                    {badgeCount > 0 && (
+                      <Badge
+                        variant="secondary"
+                        className="ml-auto h-5 px-1.5 text-[10px] font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                      >
+                        {badgeCount}
+                      </Badge>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
         </div>
 
         {/* User Card */}

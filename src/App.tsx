@@ -21,6 +21,7 @@ const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 const Resume = lazy(() => import("./pages/Resume"));
 const Articles = lazy(() => import("./pages/Article"));
 const BlogDetail = lazy(() => import("./pages/BlogDetails"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin Dashboard Components
@@ -60,6 +61,21 @@ const YoutubePage = lazy(() =>
 const SettingsPage = lazy(() =>
   import("./admin/pages/SettingsPage").then((m) => ({ default: m.SettingsPage }))
 );
+const PublishingStudioPage = lazy(() =>
+  import("./admin/pages/PublishingStudioPage").then((m) => ({ default: m.PublishingStudioPage }))
+);
+const IdeasLibraryPage = lazy(() =>
+  import("./admin/pages/IdeasLibraryPage").then((m) => ({ default: m.IdeasLibraryPage }))
+);
+const PublishingCalendarPage = lazy(() =>
+  import("./admin/pages/PublishingCalendarPage").then((m) => ({ default: m.PublishingCalendarPage }))
+);
+const PlatformConnectionsPage = lazy(() =>
+  import("./admin/pages/PlatformConnectionsPage").then((m) => ({ default: m.PlatformConnectionsPage }))
+);
+const PublishingLogsPage = lazy(() =>
+  import("./admin/pages/PublishingLogsPage").then((m) => ({ default: m.PublishingLogsPage }))
+);
 
 const queryClient = new QueryClient();
 
@@ -86,6 +102,7 @@ const App = () => (
                   <Route path="/courses/:slug" element={<CourseDetails />} />
                   <Route path="/resume" element={<Resume />} />
                   <Route path="/articles" element={<Articles />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
 
                   {/* Admin Auth Route */}
                   <Route path="/admin/login" element={<AdminLogin />} />
@@ -110,6 +127,14 @@ const App = () => (
                     <Route path="testimonials" element={<TestimonialsPage />} />
                     <Route path="youtube" element={<YoutubePage />} />
                     <Route path="settings" element={<SettingsPage />} />
+
+                    {/* AI Publishing Studio Routes */}
+                    <Route path="publishing" element={<Navigate to="/admin/publishing/studio" replace />} />
+                    <Route path="publishing/studio" element={<PublishingStudioPage />} />
+                    <Route path="publishing/ideas" element={<IdeasLibraryPage />} />
+                    <Route path="publishing/calendar" element={<PublishingCalendarPage />} />
+                    <Route path="publishing/platforms" element={<PlatformConnectionsPage />} />
+                    <Route path="publishing/logs" element={<PublishingLogsPage />} />
                   </Route>
 
                   <Route path="*" element={<NotFound />} />
