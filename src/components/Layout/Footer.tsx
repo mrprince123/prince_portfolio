@@ -40,6 +40,12 @@ const Footer = () => (
                 {link.name.toLowerCase()}
               </Link>
             ))}
+            <Link
+              to="/privacy"
+              className="font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              privacy
+            </Link>
           </div>
         </div>
 
@@ -65,15 +71,19 @@ const Footer = () => (
         </div>
       </div>
 
-      <div className="mt-12 flex flex-col items-center justify-between gap-2 border-t border-border pt-6 sm:flex-row">
+      <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
         <p className="font-mono text-xs text-muted-foreground">
           © {new Date().getFullYear()} Prince Kumar Sahni — built in New Delhi
         </p>
-        <p className="font-mono text-xs text-muted-foreground">
+        <div className="flex items-center gap-4 font-mono text-xs text-muted-foreground">
+          <Link to="/privacy" className="transition-colors hover:text-foreground">
+            privacy policy
+          </Link>
+          <span>·</span>
           <a href={`mailto:${personalInfo.email}`} className="transition-colors hover:text-foreground">
             {personalInfo.email}
           </a>
-        </p>
+        </div>
       </div>
     </div>
   </footer>

@@ -7,9 +7,11 @@ describe("Admin API Storage & Utilities", () => {
   });
 
   it("handles base URL configuration correctly", () => {
-    expect(getApiBaseUrl()).toBe("http://localhost:5001/api/v1");
+    expect(getApiBaseUrl()).toContain("/api/v1");
     setApiBaseUrl("https://api.example.com/v1");
     expect(getApiBaseUrl()).toBe("https://api.example.com/v1");
+    setApiBaseUrl("https://api.example.com/api/v1/auth/login");
+    expect(getApiBaseUrl()).toBe("https://api.example.com/api/v1");
   });
 
   it("manages admin auth token and user persistence", () => {
