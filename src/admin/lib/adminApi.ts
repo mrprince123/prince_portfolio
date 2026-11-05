@@ -22,6 +22,8 @@ import {
 export const API_BASE_URL_KEY = "admin_api_base_url";
 export const ADMIN_TOKEN_KEY = "admin_token";
 export const ADMIN_USER_KEY = "admin_user";
+export const ADMIN_AUTH_EVENT_KEY = "admin_auth_event";
+export const ADMIN_CHANNEL_NAME = "admin_auth_channel";
 
 function normalizeApiUrl(url: string): string {
   let clean = url.trim().replace(/\/+$/, "");
@@ -66,8 +68,16 @@ export function setAdminAuth(token: string, user: AdminUser) {
 }
 
 export function clearAdminAuth() {
-  localStorage.removeItem(ADMIN_TOKEN_KEY);
-  localStorage.removeItem(ADMIN_USER_KEY);
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.removeItem(ADMIN_TOKEN_KEY);
+      localStorage.removeItem(ADMIN_USER_KEY);
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+      sessionStorage.removeItem(ADMIN_USER_KEY);
+    } catch {
+      // ignore storage errors
+    }
+  }
 }
 
 export function getStoredUser(): AdminUser | null {
@@ -80,6 +90,167 @@ export function getStoredUser(): AdminUser | null {
   }
 }
 
+/**
+ * Safely decodes base64url encoded string in both browser and Node/Vitest environments.
+ */
+function decodeBase64(str: string): string {
+  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (base64.length % 4 !== 0) {
+    base64 += "=";
+  }
+  if (typeof atob === "function") {
+    return atob(base64);
+  }
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(base64, "base64").toString("binary");
+  }
+  return "";
+}
+
+/**
+ * Parses and returns the decoded payload of a JWT.
+ */
+export function parseJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const raw = decodeBase64(parts[1]);
+    const jsonStr = decodeURIComponent(
+      raw
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonStr);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns expiration timestamp in milliseconds, or null if token is invalid or has no exp.
+ */
+export function parseJwtExp(token: string): number | null {
+  const payload = parseJwtPayload(token);
+  if (!payload || typeof payload.exp !== "number") {
+    return null;
+  }
+  return payload.exp * 1000;
+}
+
+/**
+ * Returns true if the token is null, invalid, or its expiration time has passed.
+ */
+export function isTokenExpired(token: string | null): boolean {
+  if (!token) return true;
+  const expMs = parseJwtExp(token);
+  if (expMs === null) return false;
+  return Date.now() >= expMs;
+}
+
+/**
+ * Returns remaining milliseconds until token expires.
+ * Returns 0 if expired, Infinity if no exp.
+ */
+export function getTokenTimeRemaining(token: string | null): number {
+  if (!token) return 0;
+  const expMs = parseJwtExp(token);
+  if (expMs === null) return Infinity;
+  return Math.max(0, expMs - Date.now());
+}
+
+export type SessionExpiredListener = (reason: string) => void;
+const sessionExpiredListeners = new Set<SessionExpiredListener>();
+
+export function onSessionExpired(listener: SessionExpiredListener): () => void {
+  sessionExpiredListeners.add(listener);
+  return () => {
+    sessionExpiredListeners.delete(listener);
+  };
+}
+
+let lastNotificationTime = 0;
+
+/**
+ * Centralized trigger for session expiration.
+ * Clears client auth credentials, notifies all listeners, and broadcasts across open tabs.
+ */
+export function notifySessionExpired(
+  reason = "Your session has expired. Please log in again.",
+  broadcast = true
+) {
+  // Always clear storage immediately to ensure tokens cannot be reused
+  clearAdminAuth();
+
+  const now = Date.now();
+  // Throttle duplicate notifications (e.g. from multiple concurrent 401s)
+  if (now - lastNotificationTime < 2500) {
+    return;
+  }
+  lastNotificationTime = now;
+
+  if (broadcast && typeof window !== "undefined") {
+    try {
+      localStorage.setItem(
+        ADMIN_AUTH_EVENT_KEY,
+        JSON.stringify({
+          type: "session_expired",
+          reason,
+          timestamp: now,
+        })
+      );
+    } catch {
+      // ignore storage quota errors
+    }
+
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        const channel = new BroadcastChannel(ADMIN_CHANNEL_NAME);
+        channel.postMessage({ type: "session_expired", reason, timestamp: now });
+        channel.close();
+      } catch {
+        // ignore BroadcastChannel errors
+      }
+    }
+  }
+
+  // Notify context and UI listeners
+  sessionExpiredListeners.forEach((listener) => {
+    try {
+      listener(reason);
+    } catch (err) {
+      console.error("Error in sessionExpired listener:", err);
+    }
+  });
+}
+
+export function broadcastAdminLogin(user: AdminUser) {
+  if (typeof window !== "undefined") {
+    try {
+      localStorage.setItem(
+        ADMIN_AUTH_EVENT_KEY,
+        JSON.stringify({
+          type: "login",
+          user,
+          timestamp: Date.now(),
+        })
+      );
+    } catch {
+      // ignore
+    }
+
+    if (typeof BroadcastChannel !== "undefined") {
+      try {
+        const channel = new BroadcastChannel(ADMIN_CHANNEL_NAME);
+        channel.postMessage({ type: "login", user, timestamp: Date.now() });
+        channel.close();
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
+
 function createClient(): AxiosInstance {
   const instance = axios.create({
     baseURL: getApiBaseUrl(),
@@ -89,6 +260,11 @@ function createClient(): AxiosInstance {
   instance.interceptors.request.use((config) => {
     const token = getAdminToken();
     if (token) {
+      // Prevent reusing expired token: abort before sending
+      if (isTokenExpired(token)) {
+        notifySessionExpired("Your session has expired. Please log in again.");
+        return Promise.reject(new Error("Session expired. Please sign in again."));
+      }
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -97,6 +273,17 @@ function createClient(): AxiosInstance {
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
+      const isLoginUrl = error.config?.url?.includes("/auth/login");
+      const status = error.response?.status;
+      const isUnauthorized = status === 401 && !isLoginUrl;
+
+      if (isUnauthorized) {
+        const message =
+          error.response?.data?.message ||
+          "Your session has expired. Please log in again.";
+        notifySessionExpired(message);
+      }
+
       const msg =
         error.response?.data?.message ||
         error.response?.data?.error ||

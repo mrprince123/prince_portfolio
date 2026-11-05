@@ -1,5 +1,32 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { getApiBaseUrl, setApiBaseUrl, getAdminToken, setAdminAuth, clearAdminAuth, getStoredUser } from "./lib/adminApi";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import {
+  getApiBaseUrl,
+  setApiBaseUrl,
+  getAdminToken,
+  setAdminAuth,
+  clearAdminAuth,
+  getStoredUser,
+  parseJwtExp,
+  isTokenExpired,
+  getTokenTimeRemaining,
+  notifySessionExpired,
+  onSessionExpired,
+  broadcastAdminLogin,
+  ADMIN_AUTH_EVENT_KEY,
+} from "./lib/adminApi";
+
+function createMockJwt(expSecondsFromNow: number): string {
+  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+  const payload = btoa(
+    JSON.stringify({
+      userId: "user_123",
+      email: "admin@test.com",
+      role: "admin",
+      exp: Math.floor(Date.now() / 1000) + expSecondsFromNow,
+    })
+  );
+  return `${header}.${payload}.mockSignature`;
+}
 
 describe("Admin API Storage & Utilities", () => {
   beforeEach(() => {
@@ -79,6 +106,60 @@ describe("Admin API Storage & Utilities", () => {
 
     expectedRoutes.forEach((route) => {
       expect(allRoutes).toContain(route);
+    });
+  });
+
+  describe("Automatic Session Timeout & Expiration", () => {
+    it("accurately detects unexpired vs expired JWT tokens", () => {
+      const activeToken = createMockJwt(3600); // 1 hour in future
+      expect(parseJwtExp(activeToken)).toBeGreaterThan(Date.now());
+      expect(isTokenExpired(activeToken)).toBe(false);
+      expect(getTokenTimeRemaining(activeToken)).toBeGreaterThan(0);
+
+      const expiredToken = createMockJwt(-60); // 60 seconds in past
+      expect(parseJwtExp(expiredToken)).toBeLessThan(Date.now());
+      expect(isTokenExpired(expiredToken)).toBe(true);
+      expect(getTokenTimeRemaining(expiredToken)).toBe(0);
+
+      expect(isTokenExpired(null)).toBe(true);
+      expect(isTokenExpired("invalid.jwt.token")).toBe(false); // malformed fallback
+      expect(getTokenTimeRemaining(null)).toBe(0);
+    });
+
+    it("clears auth credentials and triggers session expired listeners", () => {
+      const sampleUser = { username: "Admin", email: "admin@test.com" };
+      setAdminAuth("jwt_active_session", sampleUser);
+      expect(getAdminToken()).toBe("jwt_active_session");
+
+      const mockListener = vi.fn();
+      const unsubscribe = onSessionExpired(mockListener);
+
+      notifySessionExpired("Your session has expired. Please log in again.");
+
+      expect(getAdminToken()).toBeNull();
+      expect(getStoredUser()).toBeNull();
+      expect(mockListener).toHaveBeenCalledWith(
+        "Your session has expired. Please log in again."
+      );
+
+      // Verify multi-tab sync event was written to localStorage
+      const authEvent = localStorage.getItem(ADMIN_AUTH_EVENT_KEY);
+      expect(authEvent).not.toBeNull();
+      const parsed = JSON.parse(authEvent!);
+      expect(parsed.type).toBe("session_expired");
+
+      unsubscribe();
+    });
+
+    it("broadcasts login events across tabs", () => {
+      const sampleUser = { username: "Admin", email: "admin@test.com" };
+      broadcastAdminLogin(sampleUser);
+
+      const authEvent = localStorage.getItem(ADMIN_AUTH_EVENT_KEY);
+      expect(authEvent).not.toBeNull();
+      const parsed = JSON.parse(authEvent!);
+      expect(parsed.type).toBe("login");
+      expect(parsed.user).toEqual(sampleUser);
     });
   });
 });
