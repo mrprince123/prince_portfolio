@@ -129,7 +129,14 @@ const App = () => (
                     <Route path="settings" element={<SettingsPage />} />
 
                     {/* AI Publishing Studio Routes */}
-                    <Route path="publishing" element={<Navigate to="/admin/publishing/studio" replace />} />
+                    <Route path="publishing">
+                      <Route index element={<Navigate to="/admin/publishing/studio" replace />} />
+                      <Route path="studio" element={<PublishingStudioPage />} />
+                      <Route path="ideas" element={<IdeasLibraryPage />} />
+                      <Route path="calendar" element={<PublishingCalendarPage />} />
+                      <Route path="platforms" element={<PlatformConnectionsPage />} />
+                      <Route path="logs" element={<PublishingLogsPage />} />
+                    </Route>
                     <Route path="publishing/studio" element={<PublishingStudioPage />} />
                     <Route path="publishing/ideas" element={<IdeasLibraryPage />} />
                     <Route path="publishing/calendar" element={<PublishingCalendarPage />} />
