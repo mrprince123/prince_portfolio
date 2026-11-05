@@ -41,6 +41,14 @@ export function getApiBaseUrl(): string {
   if (envUrl) {
     return normalizeApiUrl(envUrl);
   }
+  // Production fallback when deployed on remote domains (princesahni.com or *.vercel.app)
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    return "https://portfoilo-refresh-2025.vercel.app/api/v1";
+  }
   return "http://localhost:5001/api/v1";
 }
 
