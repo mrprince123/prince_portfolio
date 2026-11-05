@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAdminAuth } from "../context/AdminAuthContext";
-import { Shield, Lock, Mail, Loader2, ArrowRight } from "lucide-react";
+import { Shield, Lock, Mail, Loader2, ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,10 @@ export const AdminLogin: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/admin/overview";
+  const queryParams = new URLSearchParams(location.search);
+  const isSessionExpired =
+    queryParams.get("reason") === "expired" ||
+    (location.state as { reason?: string })?.reason === "session_expired";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +64,13 @@ export const AdminLogin: React.FC = () => {
 
         <div className="rounded-xl border border-border/60 bg-card/60 p-6 sm:p-8 backdrop-blur-xl shadow-xs">
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isSessionExpired && !errorMessage && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-500 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+                <span>Your session has expired. Please sign in again to continue.</span>
+              </div>
+            )}
+
             {errorMessage && (
               <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive">
                 {errorMessage}
